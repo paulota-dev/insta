@@ -90,7 +90,27 @@ class InstagramDownloaderApp:
         self.audio_only = tk.BooleanVar(value=False)
         ttk.Checkbutton(
             opts_frame, text="Extrair somente audio (MP3)", variable=self.audio_only
-        ).pack(anchor="w", padx=8, pady=(0, 6))
+        ).pack(anchor="w", padx=8, pady=(0, 2))
+
+        cookie_row = ttk.Frame(opts_frame)
+        cookie_row.pack(fill="x", padx=8, pady=(0, 6))
+
+        self.use_cookies = tk.BooleanVar(value=False)
+        ttk.Checkbutton(
+            cookie_row,
+            text="Usar login do navegador (resolve 'conteudo bloqueado')",
+            variable=self.use_cookies,
+        ).pack(side="left")
+
+        self.browser_choice = tk.StringVar(value="chrome")
+        browser_menu = ttk.Combobox(
+            cookie_row,
+            textvariable=self.browser_choice,
+            values=["chrome", "edge", "firefox", "brave", "opera"],
+            width=10,
+            state="readonly",
+        )
+        browser_menu.pack(side="left", padx=(8, 0))
 
         # Download button
         self.download_btn = ttk.Button(
@@ -179,6 +199,9 @@ class InstagramDownloaderApp:
         else:
             ydl_opts["format"] = "best"
 
+        if self.use_cookies.get():
+            ydl_opts["cookiesfrombrowser"] = (self.browser_choice.get(),)
+
         if self.audio_only.get():
             ydl_opts["format"] = "bestaudio/best"
             ydl_opts["postprocessors"] = [
@@ -209,7 +232,11 @@ class InstagramDownloaderApp:
             "Nao foi possivel baixar esse conteudo.\n\n"
             f"Detalhes: {message}\n\n"
             "Possiveis causas: post privado, exige login, link invalido, "
-            "ou o yt-dlp precisa ser atualizado (pip install -U yt-dlp).",
+            "ou o yt-dlp precisa ser atualizado (pip install -U yt-dlp).\n\n"
+            "Dica: marque a opcao 'Usar login do navegador' e escolha o "
+            "navegador onde voce esta logado no Instagram. Feche o navegador "
+            "antes de tentar novamente (alguns navegadores bloqueiam o "
+            "acesso aos cookies enquanto estao abertos).",
         )
 
 
